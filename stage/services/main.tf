@@ -2,12 +2,6 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-variable "server_port" {
-  description = "The port the server will use for HTTP requests"
-  type        = number
-  default     = 8080
-}
-
 data "aws_vpc" "default" {
   default = true
 }
@@ -130,7 +124,14 @@ resource "aws_lb_listener_rule" "asg" {
   }
 }
 
-output "alb_dns_name" {
-  value       = aws_lb.example.dns_name
-  description = "The domain name of the load balancer"
+terraform {
+  backend "s3" {
+    # Replace this with your bucket name!
+    bucket = "terraform-dani-bucket"
+    key    = "stage/services/webserver-cluster/terraform.tfstate"
+    region = "eu-west-1"
+    # Replace this with your DynamoDB table name!
+    dynamodb_table = "terraform-up-and-running-locks"
+    encrypt        = true
+  }
 }
