@@ -21,7 +21,7 @@ data "terraform_remote_state" "db" {
 
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-0c6d91e4a58c413a9"
-  instance_type   = "t2.nano"
+  instance_type   = var.instance_type
   security_groups = [aws_security_group.instance.id]
 
   # Render the User Data script as a template
@@ -41,11 +41,11 @@ resource "aws_autoscaling_group" "example" {
   vpc_zone_identifier  = data.aws_subnets.default.ids
   target_group_arns    = [aws_lb_target_group.asg.arn]
   health_check_type    = "ELB"
-  min_size             = 2
-  max_size             = 10
+  min_size             = var.min_size
+  max_size             = var.max_size
   tag {
-    key                 = "${var.cluster_name}-autoscaling-group"
-    value               = "${var.cluster_name}-value"
+    key                 = "Name"
+    value               = "${var.cluster_name}"
     propagate_at_launch = true
   }
 }
